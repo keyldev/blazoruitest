@@ -1,0 +1,358 @@
+﻿@page "/calculator"
+@using System.Diagnostics
+@attribute [StreamRendering]
+@rendermode InteractiveAuto
+
+<PageTitle>Calculator</PageTitle>
+
+<style>
+    .display {
+        width: 300px;
+        height: 50px;
+        background-color: black;
+        color: white;
+        font-size: 30px;
+        text-align: right;
+        padding: 10px;
+    }
+
+    .button {
+        width: 75px;
+        height: 75px;
+        font-size: 30px;
+        border: none;
+        margin: 0;
+    }
+
+        .button:hover {
+            background-color: lightgray;
+        }
+
+        .button:active {
+            background-color: gray;
+        }
+
+    .operator {
+        background-color: orange;
+        color: white;
+    }
+
+    .equal {
+        background-color: green;
+        color: white;
+    }
+
+    .container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: repeat(5, 1fr);
+        gap: 0px 0px;
+        grid-template-areas:
+            "display display display display"
+            "clear clear percent divide"
+            "seven eight nine multiply"
+            "four five six subtract"
+            "one two three add"
+            "zero zero dot equal";
+    }
+
+    .display {
+        grid-area: display;
+    }
+
+    .clear {
+        grid-area: clear;
+    }
+
+    .percent {
+        grid-area: percent;
+    }
+
+    .divide {
+        grid-area: divide;
+    }
+
+    .seven {
+        grid-area: seven;
+    }
+
+    .eight {
+        grid-area: eight;
+    }
+
+    .nine {
+        grid-area: nine;
+    }
+
+    .multiply {
+        grid-area: multiply;
+    }
+
+    .four {
+        grid-area: four;
+    }
+
+    .five {
+        grid-area: five;
+    }
+
+    .six {
+        grid-area: six;
+    }
+
+    .subtract {
+        grid-area: subtract;
+    }
+
+    .one {
+        grid-area: one;
+    }
+
+    .two {
+        grid-area: two;
+    }
+
+    .three {
+        grid-area: three;
+    }
+
+    .add {
+        grid-area: add;
+    }
+
+    .zero {
+        grid-area: zero;
+    }
+
+    .dot {
+        grid-area: dot;
+    }
+
+    .equal {
+        grid-area: equal;
+    }
+</style>
+
+<div class="container">
+    <div class="display">@output</div>
+    <button class="button clear" @onclick="Clear">C</button>
+    <button class="button percent" @onclick="Percent">%</button>
+    <button class="button operator divide" @onclick="() => SetOperator('/'.ToString())">/</button>
+    <button class="button seven" @onclick="() => AppendDigit(7)">7</button>
+    <button class="button eight" @onclick="() => AppendDigit(8)">8</button>
+    <button class="button nine" @onclick="() => AppendDigit(9)">9</button>
+    <button class="button operator multiply" @onclick="() => SetOperator('*'.ToString())">x</button>
+    <button class="button four" @onclick="() => AppendDigit(4)">4</button>
+    <button class="button five" @onclick="() => AppendDigit(5)">5</button>
+    <button class="button six" @onclick="() => AppendDigit(6)">6</button>
+    <button class="button operator subtract" @onclick="() => SetOperator('-'.ToString())">-</button>
+    <button class="button one" @onclick="() => AppendDigit(1)">1</button>
+    <button class="button two" @onclick="() => AppendDigit(2)">2</button>
+    <button class="button three" @onclick="() => AppendDigit(3)">3</button>
+    <button class="button operator add" @onclick="() => SetOperator('+'.ToString())">+</button>
+    <button class="button zero" @onclick="() => AppendDigit(0)">0</button>
+    <button class="button dot" @onclick="AppendDot">.</button>
+    <button class="button equal" @onclick="Calculate">=</button>
+</div>
+
+@code {
+    string output = "0";
+    double num1 = 0;
+    double num2 = 0;
+    string op = "";
+
+    void Clear()
+    {
+        output = "0";
+        num1 = 0;
+        num2 = 0;
+        op = "";
+    }
+
+    void Percent()
+    {
+        if (op == "")
+        {
+            num1 = num1 / 100;
+            output = num1.ToString();
+        }
+        else
+        {
+            num2 = num2 / 100;
+            output = num2.ToString();
+        }
+    }
+
+    void SetOperator(string o)
+    {
+        if (op == "")
+        {
+            op = o;
+            num1 = double.Parse(output);
+            output = "0";
+        }
+        else
+        {
+            Calculate();
+            op = o;
+        }
+    }
+
+    void AppendDigit(int d)
+    {
+        if (output == "0")
+        {
+            output = d.ToString();
+        }
+        else
+        {
+            output += d.ToString();
+        }
+
+        if (op == "")
+        {
+            num1 = double.Parse(output);
+        }
+        else
+        {
+            num2 = double.Parse(output);
+        }
+    }
+
+    void AppendDot()
+    {
+        if (!output.Contains("."))
+        {
+            output += ".";
+        }
+    }
+
+    void Calculate()
+    {
+        switch (op)
+        {
+            case "+":
+                num1 = num1 + num2;
+                break;
+            case "-":
+                num1 = num1 - num2;
+                break;
+            case "*":
+                num1 = num1 * num2;
+                break;
+            case "/":
+                num1 = num1 / num2;
+                break;
+        }
+
+        output = num1.ToString();
+        num2 = 0;
+        op = "";
+    }
+}
+
+@* <div class="calculator">
+    <p id="output">@result</p>
+    <div class="row">
+        @RenderButton("C", Clear)
+        @RenderButton("%", Percent)
+        @RenderButton("/", Divide)
+    </div>
+    <div class="row">
+        @RenderButton("7", NumberClicked)
+        @RenderButton("8", NumberClicked)
+        @RenderButton("9", NumberClicked)
+        @RenderButton("x", Multiply)
+    </div>
+    <div class="row">
+        @RenderButton("4", NumberClicked)
+        @RenderButton("5", NumberClicked)
+        @RenderButton("6", NumberClicked)
+        @RenderButton("-", Subtract)
+    </div>
+    <div class="row">
+        @RenderButton("1", NumberClicked)
+        @RenderButton("2", NumberClicked)
+        @RenderButton("3", NumberClicked)
+        @RenderButton("+", Add)
+    </div>
+    <div class="row">
+        @RenderButton("0", NumberClicked)
+        @RenderButton(".", Decimal)
+        @RenderButton("=", Calculate)
+    </div>
+</div>
+
+@code {
+    private string result = "0";
+    private double currentNumber = 0;
+    private double storedNumber = 0;
+    private string operation = "";
+
+    private void NumberClicked(string number)
+    {
+        if (result == "0" || result == "Error")
+            result = number;
+        else
+            result += number;
+        Debug.WriteLine("Asd clicked");
+    }
+
+    private void Clear()
+    {
+        result = "0";
+        currentNumber = 0;
+        storedNumber = 0;
+        operation = "";
+    }
+
+    private void Calculate()
+    {
+        try
+        {
+            currentNumber = double.Parse(result);
+            switch (operation)
+            {
+                case "+":
+                    result = (storedNumber + currentNumber).ToString();
+                    break;
+                case "-":
+                    result = (storedNumber - currentNumber).ToString();
+                    break;
+                case "x":
+                    result = (storedNumber * currentNumber).ToString();
+                    break;
+                case "/":
+                    result = (storedNumber / currentNumber).ToString();
+                    break;
+            }
+            storedNumber = currentNumber;
+            operation = "";
+        }
+        catch
+        {
+            result = "Error";
+        }
+    }
+
+    private void Add() => SetOperation("+");
+    private void Subtract() => SetOperation("-");
+    private void Multiply() => SetOperation("x");
+    private void Divide() => SetOperation("/");
+    private void Percent() => result = (double.Parse(result) / 100).ToString();
+    private void Decimal() => result += ".";
+    private void SetOperation(string op)
+    {
+        storedNumber = double.Parse(result);
+        operation = op;
+        result = "0";
+    }
+
+    private RenderFragment RenderButton(string text, Action action) => builder =>
+    {
+        builder.OpenElement(0, "button");
+        builder.AddAttribute(1, "onclick", EventCallback.Factory.Create(this, action));
+        builder.AddContent(2, text);
+        builder.CloseElement();
+    };
+} *@
