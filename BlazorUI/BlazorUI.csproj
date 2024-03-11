@@ -9,6 +9,8 @@
   <ItemGroup>
     <ProjectReference Include="..\BlazorUI.Client\BlazorUI.Client.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Common" Version="8.0.2" />
   </ItemGroup>
 
 </Project>
