@@ -1,5 +1,6 @@
 using BlazorUI.Client.Pages;
 using BlazorUI.Components;
+using BlazorUI.Hubs;
 
 namespace BlazorUI
 {
@@ -27,6 +28,13 @@ namespace BlazorUI
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapBlazorHub();
+                endpoints.MapFallbackToPage("/_Host");
+                endpoints.MapHub<ServerChatHub>(ServerChatHub.HubUrl);
+            });
 
             app.UseHttpsRedirection();
 
