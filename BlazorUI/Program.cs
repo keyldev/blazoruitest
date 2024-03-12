@@ -1,6 +1,7 @@
 using BlazorUI.Client.Pages;
 using BlazorUI.Components;
 using BlazorUI.Hubs;
+using Microsoft.AspNetCore.ResponseCompression;
 
 namespace BlazorUI
 {
@@ -14,6 +15,11 @@ namespace BlazorUI
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents()
                 .AddInteractiveWebAssemblyComponents();
+            
+            builder.Services.AddSignalR();
+
+
+
 
             var app = builder.Build();
 
@@ -29,12 +35,7 @@ namespace BlazorUI
                 app.UseHsts();
             }
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapBlazorHub();
-                endpoints.MapFallbackToPage("/_Host");
-                endpoints.MapHub<ServerChatHub>(ServerChatHub.HubUrl);
-            });
+            app.MapHub<ServerChatHub>("/chathub");
 
             app.UseHttpsRedirection();
 

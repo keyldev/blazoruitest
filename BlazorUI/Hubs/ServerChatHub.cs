@@ -5,28 +5,9 @@ namespace BlazorUI.Hubs
 {
     public class ServerChatHub : Hub
     {
-        public static string HubUrl = "/chat";
-
-        public async Task Broadcast(string username, string message)
+        public async Task SendMessage(string name, string message)
         {
-            await Clients.All.SendAsync
-                (nameof(Broadcast), username, message);
-        }
-        public override Task OnConnectedAsync()
-        {
-
-            return base.OnConnectedAsync();
-        }
-        public override Task OnDisconnectedAsync(Exception? exception)
-        {
-            Debug.WriteLine(exception);
-
-            return base.OnDisconnectedAsync(exception);
-        }
-        public ServerChatHub()
-        {
-
-
+            await Clients.All.SendAsync("ReceiveMessage", name, message);
         }
     }
 }

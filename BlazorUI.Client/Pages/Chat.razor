@@ -1,10 +1,8 @@
-﻿@page "/chat"
-@inject NavigationManager Navigation;
-@using Microsoft.AspNetCore.SignalR.Client
+﻿@page "/chat2"
 @attribute [StreamRendering]
-
-@rendermode InteractiveServer
-@using BlazorUI.Hubs
+@rendermode InteractiveAuto
+@inject NavigationManager navigationManager;
+@using Microsoft.AspNetCore.SignalR.Client;
 @using System.Diagnostics
 
 <PageTitle>Calculator</PageTitle>
@@ -135,8 +133,6 @@ else
 
     private string _hubUrl;
     private HubConnection _hubConnection;
-
-
     public async Task Chatting()
     {
         if (string.IsNullOrWhiteSpace(_username))
@@ -151,12 +147,13 @@ else
             _isChatting = true;
             await Task.Delay(1);
             _messages.Clear();
-            _hubConnection = new HubConnectionBuilder()
-            .WithUrl(Navigation.ToAbsoluteUri("/chathub"))
-            .Build();
+            string baseUrl = navigationManager.BaseUri;
+
+            _hubUrl = baseUrl.TrimEnd('/') + "/chat";
+            _hubConnection = new HubConnectionBuilder().WithUrl("http://localhost:5292/chat").Build();
 
 
-            _hubConnection.On<string, string>("ReceiveMessage", BroadcastMessage);
+            _hubConnection.On<string, string>("Broadcast", BroadcastMessage);
 
             await _hubConnection.StartAsync();
             await SendAsync($"Поприветствуем нового участника чата - {_username}");
@@ -184,7 +181,7 @@ else
     {
         if (_isChatting)
         {
-            await SendAsync($"К сожалению, {_username} покинул чат..");
+            await SendAsync($"[Notice] {_username} left chat room.");
 
             await _hubConnection.StopAsync();
             await _hubConnection.DisposeAsync();
@@ -198,7 +195,7 @@ else
     {
         if (_isChatting && !string.IsNullOrWhiteSpace(message))
         {
-            await _hubConnection.SendAsync("SendMessage", _username, message);
+            await _hubConnection.SendAsync("Broadcast", _username, message);
 
             _myMessage = string.Empty;
         }
